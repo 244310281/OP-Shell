@@ -3,7 +3,7 @@
 
 ### 使用方法
 
-1. 拉去最新脚本
+1. 拉取最新脚本
 `yum -y install git && git clone https://github.com/KU4NG/OP-Shell.git
 ` 
 
