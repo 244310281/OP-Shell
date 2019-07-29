@@ -3,6 +3,5 @@
 
 ### 使用方法
 
-`yum -y install git
-git clone https://github.com/KU4NG/OP-Shell.git
+`yum -y install git && git clone https://github.com/KU4NG/OP-Shell.git
 ` 

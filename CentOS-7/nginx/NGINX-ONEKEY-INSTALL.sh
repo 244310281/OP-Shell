@@ -110,7 +110,7 @@ PKG_PLG_PROXY=${PKG_PLG_PROXY_NAME}.zip
 PKG_PLG_CODE=${PKG_PLG_CODE_NAME}.zip
 
 # 安装包数组
-ARR_PKG=（
+ARR_PKG=(
 ${PKG_NGX}
 ${PKG_DEP_OPENSSL}
 ${PKG_DEP_PCRE}
@@ -122,7 +122,7 @@ ${PKG_PLG_FAIR}
 ${PKG_PLG_FANCYINDEX}
 ${PKG_PLG_PROXY}
 ${PKG_PLG_CODE}
-）
+)
 
 # tar.gz 包组
 ARR_PKG_TAR=(
@@ -144,7 +144,7 @@ ${PKG_PLG_CODE}
 )
 
 # 解压包数组
-ARR_PKG_NAME=（
+ARR_PKG_NAME=(
 ${PKG_NGX_NAME}
 ${PKG_DEP_OPENSSL_NAME}
 ${PKG_DEP_PCRE_NAME}
@@ -156,7 +156,7 @@ ${PKG_PLG_FAIR_NAME}
 ${PKG_PLG_FANCYINDEX_NAME}
 ${PKG_PLG_PROXY_NAME}
 ${PKG_PLG_CODE_NAME}
-）
+)
 
 #############################################################################################
 # 颜色输出函数
