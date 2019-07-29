@@ -3,5 +3,14 @@
 
 ### 使用方法
 
+1. 拉去最新脚本
 `yum -y install git && git clone https://github.com/KU4NG/OP-Shell.git
 ` 
+
+2. 进入 packages 目录，如 nginx 的 OP-Shell/CentOS-7/nginx/packages
+
+3. 查看 README.md，前往下载所需的包到 packages 目录
+
+4. 返回需要执行服务根目录，如：OP-Shell/CentOS-7/nginx
+
+5. 执行 .sh 脚本，选择参数安装
