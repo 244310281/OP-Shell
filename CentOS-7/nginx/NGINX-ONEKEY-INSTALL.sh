@@ -58,10 +58,10 @@ LINE='--------------------------------------------------------------------------
 # 基础路径 / 安装路径 / 配置路径 / 日志路径 / 项目路径 / 备份路径
 PATH_BASE="/data"
 PATH_NGX_BASE_INSTALL="${PATH_BASE}/services/nginx"
-PATH_CONFIG="${PATH_NGX_BASE_INSTALL}/conf"
+PATH_NGX_CONFIG="${PATH_NGX_BASE_INSTALL}/conf"
 PATH_NGX_LOG="${PATH_BASE}/logs/nginx"
-PATH_WEB="${PATH_BASE}/www/nginx"
-PATH_BACKUP="${PATH_BASE}/backup/nginx"
+PATH_NGX_WEB="${PATH_BASE}/www/nginx"
+PATH_NGX_BACKUP="${PATH_BASE}/backup/nginx"
 
 # 安装包 / 模板路径
 PATH_PWD=$(/usr/bin/pwd)
@@ -75,7 +75,7 @@ PATH_INIT_CONFIG_SYSTEM="${PATH_INIT_CONFIG}/system"
 USER_PROCESS='root'
 
 # 安装包下载地址
-PKG_DOWNLOAD_URL='源码包下载链接: https://pan.baidu.com/s/1IpRtZgYFb-Kf71ED3pBEwQ 提取码: 2k6t'
+PKG_DOWNLOAD_URL='源码包下载链接：https://pan.baidu.com/s/1IpRtZgYFb-Kf71ED3pBEwQ【提取码：2k6t】'
 
 # 主程序解压包名称
 PKG_NGX_NAME='nginx-1.16.0'
@@ -232,7 +232,7 @@ function FUNC_USER_CHECK() {
 #############################################################################################
 function FUNC_NETWORK_CHECK() {
   VAR_PING_NUM=$(/usr/bin/ping -c 3 www.baidu.com | grep 'icmp_seq' | wc -l)
-  if [[ ${VAR_PING_NUM} -ne 0 ]];then
+  if [[ ${VAR_PING_NUM} -eq 0 ]];then
     FUNC_ECHO_ERROR '网络连接失败，请先配置好网络连接...'
     exit 1004
   fi
@@ -246,9 +246,10 @@ function FUNC_INSTALL_CHECK() {
   if [[ -d ${PATH_NGX_BASE_INSTALL} ]];then
     cd ${PATH_NGX_BASE_INSTALL}
     if [[ $(ls -l | wc -l) -gt 1 ]];then
-      FUNC_ECHO_RED "安装路径下已存在未知文件，请确认无用后删掉再次执行安装!"
+      FUNC_ECHO_RED "安装路径 [${PATH_NGX_BASE_INSTALL}] 下已存在未知文件，请确认无用后删掉再次执行安装!"
       exit 1005
     fi
+  fi
 }
 
 #############################################################################################
@@ -261,14 +262,14 @@ function FUNC_PACKAGE_CHECK() {
   # 检测安装包
   cd ${PATH_PKG}
   for PKG in ${ARR_PKG[*]};do
-    if [[ -f ${PKG} ]];then
+    if [[ ! -f ${PKG} ]];then
       ARR_NOT_EXIST_PKG[${#ARR_NOT_EXIST_PKG[@]}]=${PKG}
     fi
   done
 
   # 输出不存在安装包
   if [[ ${#ARR_NOT_EXIST_PKG[@]} -ne 0 ]];then
-    FUNC_ECHO_ERROR '缺失安装包列表：' 
+    FUNC_ECHO_ERROR "缺失安装包列表 [${PATH_PKG}]："
     for PKG in ${ARR_NOT_EXIST_PKG[*]};do
       FUNC_ECHO_RED "缺失安装包：${PKG}"
     done
@@ -318,13 +319,13 @@ function FUNC_INSTALL_INFO() {
   FUNC_ECHO_GREEN ${LINE}
   FUNC_ECHO_GREEN "安装路径: ${PATH_NGX_BASE_INSTALL}"
   FUNC_ECHO_GREEN "日志路径: ${PATH_NGX_LOG}"
-  FUNC_ECHO_GREEN "项目路径: ${PATH_WEB}"
+  FUNC_ECHO_GREEN "项目路径: ${PATH_NGX_WEB}"
   FUNC_ECHO_GREEN "备份路径: ${PATH_NGX_BACKUP}"
-  FUNC_ECHO_GREEN "模板路径: ${PATH_CONFIG}/templates"
-  FUNC_ECHO_GREEN "认证路径: ${PATH_CONFIG}/users"
-  FUNC_ECHO_GREEN "证书路径: ${PATH_CONFIG}/certs"
-  FUNC_ECHO_GREEN "主机路径: ${PATH_CONFIG}/vhosts"
-  FUNC_ECHO_GREEN "TCP 代理: ${PATH_CONFIG}/tcp"
+  FUNC_ECHO_GREEN "模板路径: ${PATH_NGX_CONFIG}/templates"
+  FUNC_ECHO_GREEN "认证路径: ${PATH_NGX_CONFIG}/users"
+  FUNC_ECHO_GREEN "证书路径: ${PATH_NGX_CONFIG}/certs"
+  FUNC_ECHO_GREEN "主机路径: ${PATH_NGX_CONFIG}/vhosts"
+  FUNC_ECHO_GREEN "TCP 代理: ${PATH_NGX_CONFIG}/tcp"
   FUNC_ECHO_GREEN "配置检查: ${PATH_NGX_BASE_INSTALL}/sbin/nginx -t"
   FUNC_ECHO_GREEN "启动命令: ${PATH_NGX_BASE_INSTALL}/sbin/nginx"
   FUNC_ECHO_GREEN "安装用时：${TIME_USE} 秒"
@@ -337,18 +338,18 @@ function FUNC_INSTALL_INFO() {
 function FUNC_SYSTEM_TUNING() {
   # 创建相关目录
   mkdir -p ${PATH_NGX_LOG}
-  mkdir -p ${PATH_WEB}
-  mkdir -p ${PATH_BACKUP}
+  mkdir -p ${PATH_NGX_WEB}
+  mkdir -p ${PATH_NGX_BACKUP}
 
   # 打开文件数
   if [[ -f ${PATH_INIT_CONFIG_SYSTEM}/limits.conf ]];then
-    mv /etc/security/limits.conf ${PATH_BACKUP}
+    mv /etc/security/limits.conf ${PATH_NGX_BACKUP}/limits.conf-$(/usr/bin/date +%F)
     cp ${PATH_INIT_CONFIG_SYSTEM}/limits.conf /etc/security/
   fi
 
   # 内核调优
   if [[ -f ${PATH_INIT_CONFIG_SYSTEM}/sysctl.conf ]];then
-    mv /etc/sysctl.conf ${PATH_BACKUP}
+    mv /etc/sysctl.conf ${PATH_NGX_BACKUP}/sysctl.conf-$(/usr/bin/date +%F)
     cp ${PATH_INIT_CONFIG_SYSTEM}/sysctl.conf /etc/
   fi
 
@@ -390,7 +391,7 @@ function FUNC_INSTALL_NGINX() {
   for PKG in ${ARR_PKG_TAR[*]};do
     tar -zxf ${PKG}
     if [[ $? -ne 0 ]];then
-      FUNC_ECHO_ERROR '${PKG} 失败，请检查该源码包是否存在问题！'
+      FUNC_ECHO_ERROR "${PKG} 解压失败，请检查该源码包是否存在问题！"
       exit 1008
     fi
   done
@@ -399,7 +400,7 @@ function FUNC_INSTALL_NGINX() {
   for PKG in ${ARR_PKG_ZIP[*]};do
     unzip ${PKG}
     if [[ $? -ne 0 ]];then
-      FUNC_ECHO_ERROR '${PKG} 失败，请检查该源码包是否存在问题！'
+      FUNC_ECHO_ERROR "${PKG} 解压失败，请检查该源码包是否存在问题！"
       exit 1009
     fi
   done
@@ -456,7 +457,7 @@ function FUNC_INSTALL_NGINX() {
 #############################################################################################
 function FUNC_INIT_NGINX() {
   # 创建配置目录
-  cd ${PATH_CONFIG} && mkdir -p {users,vhosts,certs,tcp,templates}
+  cd ${PATH_NGX_CONFIG} && mkdir -p {users,vhosts,certs,tcp,templates}
   
   if [[ $? -ne 0 ]];then
     FUNC_ECHO_ERROR '配置文件目录初始化失败，请检查！'
@@ -464,18 +465,18 @@ function FUNC_INIT_NGINX() {
   fi
 
   # 拷贝主配置文件
-  mv ${PATH_CONFIG}/nginx.conf ${PATH_BACKUP}
-  sed -i "s#/data/logs/nginx#${PATH_NGX_LOG}#g" ${PATH_CONFIG}/nginx.conf
-  cp ${PATH_INIT_CONFIG_TEMPLATE}/nginx.conf ${PATH_CONFIG}
+  mv ${PATH_NGX_CONFIG}/nginx.conf ${PATH_NGX_BACKUP}/nginx.conf-$(/usr/bin/date +%F)
+  cp ${PATH_INIT_CONFIG_TEMPLATE}/nginx.conf ${PATH_NGX_CONFIG}
+  sed -i "s#/data/logs/nginx#${PATH_NGX_LOG}#g" ${PATH_NGX_CONFIG}/nginx.conf
 
   # 配置 demo 文件
-  mkdir ${PATH_WEB}/demo
-  echo '<h1>Welcome to nginx!</h1>' > ${PATH_WEB}/demo/index.html
-  sed -i "s#/data/www/nginx#${PATH_WEB}#g" ${PATH_CONFIG}/nginx.conf
-  cp ${PATH_INIT_CONFIG_TEMPLATE}/demo.conf /${PATH_CONFIG}/vhost/
+  mkdir ${PATH_NGX_WEB}/demo
+  echo '<h1>Welcome to nginx!</h1>' > ${PATH_NGX_WEB}/demo/index.html
+  cp ${PATH_INIT_CONFIG_TEMPLATE}/demo.conf ${PATH_NGX_CONFIG}/vhosts/
+  sed -i "s#/data/www/nginx#${PATH_NGX_WEB}#g" ${PATH_NGX_CONFIG}/vhosts/demo.conf
 
   # 添加其它配置模板
-  cp ${PATH_INIT_CONFIG_TEMPLATE}/*.conf ${PATH_CONFIG}/templates/
+  cp ${PATH_INIT_CONFIG_TEMPLATE}/*.conf ${PATH_NGX_CONFIG}/templates/
 }
 
 
@@ -493,19 +494,25 @@ FUNC_INSTALL_CHECK
 # 安装包检测
 FUNC_PACKAGE_CHECK
 # 打印系统信息
-FUNC_INSTALL_INFO
+FUNC_PRINT_SYSTEM_INFO
 
 read -p "是否继续安装（默认 y） [y/n]: " VAR_CHOICE
 case ${VAR_CHOICE} in
   [yY][eE][sS]|[yY])
     # 系统调优
     FUNC_SYSTEM_TUNING
+    sleep 2
     # 依赖安装
     FUNC_YUM_DEPENDS
+    sleep 2
     # 编译安装
     FUNC_INSTALL_NGINX
+    sleep 2
     # 优化配置
     FUNC_INIT_NGINX
+    sleep 2
+    # 输出安装信息
+    FUNC_INSTALL_INFO
   ;;
   [nN][oO]|[nN])
       FUNC_ECHO_YELLOW "安装即将终止..."
@@ -514,10 +521,16 @@ case ${VAR_CHOICE} in
   *)
     # 系统调优
     FUNC_SYSTEM_TUNING
+    sleep 2
     # 依赖安装
     FUNC_YUM_DEPENDS
+    sleep 2
     # 编译安装
     FUNC_INSTALL_NGINX
+    sleep 2
     # 优化配置
     FUNC_INIT_NGINX
+    sleep 2
+    # 输出安装信息
+    FUNC_INSTALL_INFO
 esac
