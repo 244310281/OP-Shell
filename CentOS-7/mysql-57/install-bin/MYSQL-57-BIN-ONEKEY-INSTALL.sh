@@ -352,15 +352,15 @@ LimitNOFILE=5000" > /etc/systemd/system/mysqld.service
   fi
 
   # 初始化用户
-  MYSQL_USER_INIT_SQL="alter user root@\'localhost\' identified by \'${MYSQL_INIT_PASSWORD}\'"
+  MYSQL_USER_INIT_SQL="alter user root@'localhost' identified by '${MYSQL_INIT_PASSWORD}';"
   echo ${LINE}
-  FUNC_ECHO_YELLOW ${MYSQL_USER_INIT_SQL}
+  echo ${MYSQL_USER_INIT_SQL}
   echo ${LINE}
-  
-  mysql -P ${MYSQL_PORT} -e ${MYSQL_USER_INIT_SQL}
+
+  mysql -P ${MYSQL_PORT} -e "${MYSQL_USER_INIT_SQL}"
 
   if [[ $? -ne 0 ]];then
-    FUNC_ECHO_ERROR 'MySQL 用户初始失败，请手动初始化！'
+    FUNC_ECHO_ERROR 'MySQL 用户初始失败，目前 root 没有密码，你可以请手动初始化！'
     exit 1013
   fi
 }
@@ -395,8 +395,8 @@ case ${VAR_CHOICE} in
     FUNC_INSTALL_INFO
   ;;
   [nN][oO]|[nN])
-      FUNC_ECHO_YELLOW "安装即将终止..."
-      exit
+    FUNC_ECHO_YELLOW "安装即将终止..."
+    exit
   ;;
   *)
     # 系统调优
