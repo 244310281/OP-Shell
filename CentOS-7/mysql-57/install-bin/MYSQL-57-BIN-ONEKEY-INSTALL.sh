@@ -352,7 +352,12 @@ LimitNOFILE=5000" > /etc/systemd/system/mysqld.service
   fi
 
   # 初始化用户
-  mysql -P ${MYSQL_PORT} -e "alter user root@'localhost' identified by \'${MYSQL_INIT_PASSWORD}\';"
+  MYSQL_USER_INIT_SQL="alter user root@\'localhost\' identified by \'${MYSQL_INIT_PASSWORD}\'"
+  echo ${LINE}
+  FUNC_ECHO_YELLOW ${MYSQL_USER_INIT_SQL}
+  echo ${LINE}
+  
+  mysql -P ${MYSQL_PORT} -e ${MYSQL_USER_INIT_SQL}
 
   if [[ $? -ne 0 ]];then
     FUNC_ECHO_ERROR 'MySQL 用户初始失败，请手动初始化！'
