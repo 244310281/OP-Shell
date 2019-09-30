@@ -379,9 +379,6 @@ case ${VAR_CHOICE} in
     # 系统调优
     FUNC_SYSTEM_TUNING
     sleep 2
-    # 编译安装
-    FUNC_INSTALL_NGINX
-    sleep 2
     # 安装
     FUNC_INSTALL_MYSQL
     sleep 2
@@ -398,9 +395,6 @@ case ${VAR_CHOICE} in
   *)
     # 系统调优
     FUNC_SYSTEM_TUNING
-    sleep 2
-    # 编译安装
-    FUNC_INSTALL_NGINX
     sleep 2
     # 安装
     FUNC_INSTALL_MYSQL
