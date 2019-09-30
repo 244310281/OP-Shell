@@ -277,6 +277,7 @@ function FUNC_INSTALL_MYSQL() {
   cd ${PATH_PKG}
 
   # 解压 tar.gz
+  FUNC_ECHO_YELLOW "开始安装 MySQL，这将花费一定时间..."
   for PKG in ${ARR_PKG_TAR[*]};do
     tar -zxf ${PKG}
     if [[ $? -ne 0 ]];then
@@ -351,7 +352,7 @@ LimitNOFILE=5000" > /etc/systemd/system/mysqld.service
   fi
 
   # 初始化用户
-  mysql -P ${MYSQL_PORT} -e "alter user root@'localhost' identified by ${MYSQL_INIT_PASSWORD};"
+  mysql -P ${MYSQL_PORT} -e "alter user root@'localhost' identified by \'${MYSQL_INIT_PASSWORD}\';"
 
   if [[ $? -ne 0 ]];then
     FUNC_ECHO_ERROR 'MySQL 用户初始失败，请手动初始化！'
