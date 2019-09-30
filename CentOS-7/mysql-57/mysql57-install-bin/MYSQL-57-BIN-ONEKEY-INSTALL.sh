@@ -175,24 +175,9 @@ function FUNC_INSTALL_CHECK() {
 # 安装包检测函数
 #############################################################################################
 function FUNC_PACKAGE_CHECK() {
-  # 不存在的数组
-  ARR_NOT_EXIST_PKG=()
-  
   # 检测安装包
-  cd ${PATH_PKG}
-  for PKG in ${ARR_PKG[*]};do
-    if [[ ! -f ${PKG} ]];then
-      ARR_NOT_EXIST_PKG[${#ARR_NOT_EXIST_PKG[@]}]=${PKG}
-    fi
-  done
-
-  # 输出不存在安装包
-  if [[ ${#ARR_NOT_EXIST_PKG[@]} -ne 0 ]];then
-    FUNC_ECHO_ERROR "缺失安装包列表 [${PATH_PKG}]："
-    for PKG in ${ARR_NOT_EXIST_PKG[*]};do
-      FUNC_ECHO_RED "缺失安装包：${PKG}"
-    done
-    FUNC_ECHO_RED ${PKG_DOWNLOAD_URL}
+  if [[ ! -f ${PATH_PKG}/${PKG_MYSQL} ]];then
+    FUNC_ECHO_RED "缺失安装包：${PKG_MYSQL}，请上传到：${PATH_PKG}"
     exit 1006
   fi
 }
